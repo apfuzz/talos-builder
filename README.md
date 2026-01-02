@@ -16,23 +16,41 @@ The motiviation to do this is to build a Talos RPi 5 cluster with NVMe drives fo
 - git 2.50.1
 - gmake 4.4.1
 
+## Set up build environment
+
+```sh
+# install crane
+brew install crane
+
+# Clones all dependencies and applies the necessary patches
+gmake checkouts patches
+
+# Modify checkouts/talos/Makefile due to [known issue](https://github.com/docker/buildx/
+gsed -i 's/rewrite-timestamp=true/rewrite-timestamp=false/' checkouts/talos/Makefile 
+
+# Replace `sed` with `gsed` in talos Makefile
+gsed -i 's/\ sed\ /\ gsed\ /g' checkouts/talos/Makefile 
+
+# Log into GitHub
+docker login ghcr.io
+
+# set GitHub token (for crane push)
+export GITHUB_TOKEN=<secret>
+```
+
 ## Building
 
 Modified build notes
 
 ```sh
-# Clones all dependencies and applies the necessary patches
-make checkouts patches
-
-# Modify checkouts/talos/Makefile to add `unpack=false` to registry build target due to [known issue](https://github.com/docker/buildx/
-gsed -i 's/type=image/type=image,unpack=false/' checkouts/talos/Makefile 
-
 # Builds the Linux Kernel (can take a while)
-make REGISTRY=ghcr.io REGISTRY_USERNAME=apfuzz kernel
+gmake REGISTRY=ghcr.io REGISTRY_USERNAME=apfuzz kernel
 
 # Builds the overlay (U-Boot, dtoverlays ...)
-make REGISTRY=ghcr.io REGISTRY_USERNAME=apfuzz overlay
+gmake REGISTRY=ghcr.io REGISTRY_USERNAME=apfuzz overlay
+
+# Change visibility of sbc-raspberrypi5 package to public
 
 # Final step to build the installer and disk image
-make REGISTRY=ghcr.io REGISTRY_USERNAME=apfuzz installer
+gmake REGISTRY=ghcr.io REGISTRY_USERNAME=apfuzz installer
 ```
