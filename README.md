@@ -1,52 +1,38 @@
 # Raspberry Pi 5 Talos Builder
-This repository serves as the glue to build custom Talos images for the Raspberry Pi 5. It patches the Kernel and Talos build process to use the Linux Kernel source provided by [raspberrypi/linux](https://github.com/raspberrypi/linux). 
 
-## Tested on
-So far, this release has been verified on:
+Forked from [talos-rpi5/talos-builder](https://github.com/talos-rpi5/talos-builder) and modified as follows.
 
-| ✅ Hardware                                                |
-|------------------------------------------------------------|
-| Raspberry Pi Compute Module 5 on Compute Module 5 IO Board |
-| Raspberry Pi Compute Module 5 Lite on [DeskPi Super6C](https://wiki.deskpi.com/super6c/) |
-| Raspberry Pi 5b with [RS-P11 for RS-P22 RPi5](https://wiki.52pi.com/index.php?title=EP-0234) |
+- Add changes in [PR #20](https://github.com/talos-rpi5/talos-builder/pull/20/commits/f2f351025e9d0a0409899b0351a44e3231a44280), specifically for multiple extensions
+- Add iscsi-tools extension
+- Modify checkouts/talos/Makefile to add `unpack=false` to registry build target due to [known issue](https://github.com/docker/buildx/issues/2733)
+- replace `sed` with `gsed` where applicable
 
-## What's not working?
-* Booting from USB: USB is only available once LINUX has booted up but not in U-Boot.
+The motiviation to do this is to build a Talos RPi 5 cluster with NVMe drives for use with [Longhorn](https://longhorn.io).
 
-## How to use?
-The releases on this repository align with the corresponding Talos version. There is a raw disk image (initial setup) and an installer image (upgrades) provided. 
+## Build environment
 
-### Examples
-Initial:
-```
-unzstd metal-arm64-rpi.raw.zst
-dd if=metal-arm64-rpi.raw of=<disk> bs=4M status=progress
-sync
-```
-
-Upgrade:
-```
-talosctl upgrade \
-  --nodes <node IP> \
-  --image ghcr.io/talos-rpi5/installer:<version>
-```
+- MacOS 26 on Apple M2
+- Docker 28.3.2
+- git 2.50.1
+- gmake 4.4.1
 
 ## Building
-If you'd like to make modifications, it is possible to create your own build. Bellow is an example of the standard build.
 
-```
+Modified build notes
+
+```sh
 # Clones all dependencies and applies the necessary patches
 make checkouts patches
 
+# Modify checkouts/talos/Makefile to add `unpack=false` to registry build target due to [known issue](https://github.com/docker/buildx/
+gsed -i 's/type=image/type=image,unpack=false/' checkouts/talos/Makefile 
+
 # Builds the Linux Kernel (can take a while)
-make REGISTRY=ghcr.io REGISTRY_USERNAME=<username> kernel
+make REGISTRY=ghcr.io REGISTRY_USERNAME=apfuzz kernel
 
 # Builds the overlay (U-Boot, dtoverlays ...)
-make REGISTRY=ghcr.io REGISTRY_USERNAME=<username> overlay
+make REGISTRY=ghcr.io REGISTRY_USERNAME=apfuzz overlay
 
 # Final step to build the installer and disk image
-make REGISTRY=ghcr.io REGISTRY_USERNAME=<username> installer
+make REGISTRY=ghcr.io REGISTRY_USERNAME=apfuzz installer
 ```
-
-## License
-See [LICENSE](LICENSE).
