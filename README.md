@@ -55,16 +55,3 @@ gmake REGISTRY=ghcr.io REGISTRY_USERNAME=apfuzz installer
 
 # Change visibility of installer package to public
 ```
-
-## Upgrading
-
-```sh
-# tidy up first
-make clean
-
-# update PKG_VERSION in Makefile with [desired tag](https://github.com/siderolabs/pkgs/tags)
-
-# update TALOS_VERSION in Makefile with [desired tag](https://github.com/siderolabs/talos/tags)
-
-# proceed normally starting with pre-build steps
-```
