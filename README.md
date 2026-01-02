@@ -19,20 +19,22 @@ The motiviation to do this is to build a Talos RPi 5 cluster with NVMe drives fo
 ## Pre-build tasks
 
 ```sh
-# Clone all dependencies and apply patches
-gmake checkouts patches
-
-# Modify talos Makefile due to [known issue](https://github.com/docker/buildx/issues/2733)
-gsed -i 's/rewrite-timestamp=true/rewrite-timestamp=false/' checkouts/talos/Makefile 
-
-# Replace `sed` with `gsed` in talos Makefile
-gsed -i 's/\ sed\ /\ gsed\ /g' checkouts/talos/Makefile 
-
 # Log into GitHub
 docker login ghcr.io
 
 # set GitHub token (for crane push)
 export GITHUB_TOKEN=<secret>
+# Clone all dependencies and apply patches
+gmake checkouts patches
+
+# Modify talos Makefile due to [known issue](https://github.com/docker/buildx/issues/2733)
+gsed -i 's/rewrite-timestamp=true/rewrite-timestamp=false/' checkouts/talos/Makefile
+
+# Replace `sed` with `gsed` in talos Makefile
+gsed -i 's/\ sed\ /\ gsed\ /g' checkouts/talos/Makefile
+
+# commit changes locally so the build is not flagged as dirty
+git commit -am "fixes for local build env"
 ```
 
 ## Building
@@ -52,4 +54,17 @@ gmake REGISTRY=ghcr.io REGISTRY_USERNAME=apfuzz overlay
 gmake REGISTRY=ghcr.io REGISTRY_USERNAME=apfuzz installer
 
 # Change visibility of installer package to public
+```
+
+## Upgrading
+
+```sh
+# tidy up first
+make clean
+
+# update PKG_VERSION in Makefile with [desired tag](https://github.com/siderolabs/pkgs/tags)
+
+# update TALOS_VERSION in Makefile with [desired tag](https://github.com/siderolabs/talos/tags)
+
+# proceed normally starting with pre-build steps
 ```
