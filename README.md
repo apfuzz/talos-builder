@@ -4,28 +4,25 @@ Forked from [talos-rpi5/talos-builder](https://github.com/talos-rpi5/talos-build
 
 - Add changes in [PR #20](https://github.com/talos-rpi5/talos-builder/pull/20/commits/f2f351025e9d0a0409899b0351a44e3231a44280), specifically for multiple extensions
 - Add iscsi-tools extension
-- Modify checkouts/talos/Makefile to add `unpack=false` to registry build target due to [known issue](https://github.com/docker/buildx/issues/2733)
-- replace `sed` with `gsed` where applicable
+- Modify talos Makefile to accomodate local build environment
 
 The motiviation to do this is to build a Talos RPi 5 cluster with NVMe drives for use with [Longhorn](https://longhorn.io).
 
 ## Build environment
 
-- MacOS 26 on Apple M2
+- MacOS 26 on Apple M2 Pro
+- crane 0.20.7
 - Docker 28.3.2
 - git 2.50.1
 - gmake 4.4.1
 
-## Set up build environment
+## Pre-build tasks
 
 ```sh
-# install crane
-brew install crane
-
-# Clones all dependencies and applies the necessary patches
+# Clone all dependencies and apply patches
 gmake checkouts patches
 
-# Modify checkouts/talos/Makefile due to [known issue](https://github.com/docker/buildx/
+# Modify talos Makefile due to [known issue](https://github.com/docker/buildx/issues/2733)
 gsed -i 's/rewrite-timestamp=true/rewrite-timestamp=false/' checkouts/talos/Makefile 
 
 # Replace `sed` with `gsed` in talos Makefile
