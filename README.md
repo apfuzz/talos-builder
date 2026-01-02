@@ -53,4 +53,6 @@ gmake REGISTRY=ghcr.io REGISTRY_USERNAME=apfuzz overlay
 
 # Final step to build the installer and disk image
 gmake REGISTRY=ghcr.io REGISTRY_USERNAME=apfuzz installer
+
+# Change visibility of installer package to public
 ```
