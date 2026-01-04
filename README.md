@@ -2,7 +2,7 @@
 
 Forked from [talos-rpi5/talos-builder](https://github.com/talos-rpi5/talos-builder) and modified as follows.
 
-- Add changes in [PR #20](https://github.com/talos-rpi5/talos-builder/pull/20/commits/f2f351025e9d0a0409899b0351a44e3231a44280), specifically for multiple extensions
+- Add changes from [PR #20](https://github.com/talos-rpi5/talos-builder/pull/20/commits/f2f351025e9d0a0409899b0351a44e3231a44280), specifically for multiple extensions
 - Add iscsi-tools extension
 - Modify talos Makefile to accomodate local build environment
 
@@ -24,6 +24,7 @@ docker login ghcr.io
 
 # set GitHub token (for crane push)
 export GITHUB_TOKEN=<secret>
+
 # Clone all dependencies and apply patches
 gmake checkouts patches
 
